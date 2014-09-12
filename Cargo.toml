@@ -1,0 +1,10 @@
+[package]
+
+name = "schedule_gen"
+version = "0.0.1"
+authors = [ "ethan.frei@gmail.com" ]
+
+[lib]
+
+name = "schedule_gen"
+
