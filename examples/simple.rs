@@ -8,9 +8,9 @@ fn main() {
     let thing = schedule_gen::LeagueSpec {
         teams: vec![],
         locations: vec![
-            IdAndName { id: "1".to_string(), name: "name1".to_string() },
-            IdAndName { id: "2".to_string(), name: "name2".to_string() },
-            IdAndName { id: "3".to_string(), name: "name3".to_string() }
+            IdAndName { id: "1", name: "name1" },
+            IdAndName { id: "2", name: "name2" },
+            IdAndName { id: "3", name: "name3" }
         ],
         start_date: Date {
             day: 15,
@@ -31,21 +31,21 @@ fn main() {
                             hour: 16,
                             min: 0
                         },
-                        location_ids: vec!["1".to_string(), "2".to_string()]
+                        location_ids: vec![ "1", "2" ]
                     },
                     GameTime {
                         time: Time {
                             hour: 17,
                             min: 0
                         },
-                        location_ids: vec!["1".to_string(), "3".to_string()]
+                        location_ids: vec![ "1", "3" ]
                     },
                     GameTime {
                         time: Time {
                             hour: 18,
                             min: 0
                         },
-                        location_ids: vec!["2".to_string(), "3".to_string()]
+                        location_ids: vec![ "2", "3" ]
                     }
                 ]
             }

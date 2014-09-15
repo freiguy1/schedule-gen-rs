@@ -17,8 +17,8 @@ pub struct LeagueSpec {
 
 
 pub struct IdAndName {
-    pub id: String,
-    pub name: String
+    pub id: &'static str,
+    pub name: &'static str
 }
 
 pub struct Time {
@@ -39,7 +39,7 @@ pub struct GameWeekday {
 
 pub struct GameTime {
     pub time: Time,
-    pub location_ids: Vec<String>
+    pub location_ids: Vec<&'static str>
 }
 
 pub enum Weekday {
@@ -103,7 +103,7 @@ pub fn validate(spec: LeagueSpec) {
     }
 
     //Make sure all locations are used at least once
-    let mut used_locations: HashSet<String> = HashSet::new();
+    let mut used_locations: HashSet<&str> = HashSet::new();
     for game_weekday in spec.game_weekdays.iter() {
         for game_time in game_weekday.game_times.iter() {
             for location_id in game_time.location_ids.iter() {
