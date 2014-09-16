@@ -144,6 +144,16 @@ pub fn validate(spec: LeagueSpec) -> Vec<&'static str> {
         result.push("Locations used in game_weekdays are not equal to the list of locations");
     }
 
+    // Make sure there's at least 2 teams
+    if spec.teams.len() < 2 {
+        result.push("There must be at least two teams");
+    }
+
+    // Make sure there's at least one location
+    if spec.locations.len() == 0 {
+        result.push("There must be at least one location");
+    }
+
     // Make sure there's at least one time for each game weekday
     // Make sure there's at least one location for each time for each weekday
     let mut has_times = true;
@@ -186,17 +196,29 @@ pub fn validate(spec: LeagueSpec) -> Vec<&'static str> {
         result.push("All game times must be valid times");
     }
 
-    // Make sure there's at least 2 teams
-    if spec.teams.len() < 2 {
-        result.push("There must be at least two teams");
+    // Check that times don't repeat on a given day
+    let mut has_time_repeats = false;
+    for game_weekday in spec.game_weekdays.iter() {
+        let set: HashSet<uint> = game_weekday.game_times.iter()
+            .map(|time| time.time.hour as uint * 60 + time.time.min as uint).collect();
+        has_time_repeats = has_time_repeats || set.len() != game_weekday.game_times.len();
     }
 
-    // Make sure there's at least one location
-    if spec.locations.len() == 0 {
-        result.push("There must be at least one location");
+    if has_time_repeats {
+        result.push("There cannot be repeating game times on a particular day");
     }
 
+    // Check for a valid number of games per week given the team count
+    let  required_games_per_week = spec.teams.len() / 2;
+    let  actual_games_per_week = 
+        spec.game_weekdays.iter()
+        .fold(0, |sum, day| sum + 
+            day.game_times.iter()
+                .fold(0, |sum2, time| sum2 + time.location_ids.len()));
 
+    if required_games_per_week != actual_games_per_week {
+        result.push("There are a different number of possible games per week than team matchups");
+    }
 
     result
 
