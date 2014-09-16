@@ -6,7 +6,11 @@ fn main() {
     println!("Hello world!");
 
     let thing = schedule_gen::LeagueSpec {
-        teams: vec![],
+        teams: vec![
+            IdAndName { id: "1", name: "team1" },
+            IdAndName { id: "2", name: "team2" },
+            IdAndName { id: "3", name: "team3" }
+        ],
         locations: vec![
             IdAndName { id: "1", name: "name1" },
             IdAndName { id: "2", name: "name2" },
