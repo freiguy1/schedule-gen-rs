@@ -18,7 +18,7 @@ fn main() {
             year: 2014
         },
         end_date: Date {
-            day: 24,
+            day: 25,
             month: 9,
             year: 2014
         },
