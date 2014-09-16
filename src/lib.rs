@@ -80,15 +80,20 @@ impl Weekday {
 
 }
 
-pub fn validate(spec: LeagueSpec) {
+pub fn validate(spec: LeagueSpec) -> Vec<&'static str> {
+
+    let mut result: Vec<&str> = Vec::new();
+
     let start_date = NaiveDate::from_ymd(
         spec.start_date.year as i32,
         spec.start_date.month as u32,
         spec.start_date.day as u32);
     let end_date = NaiveDate::from_ymd(
-        spec.start_date.year as i32,
-        spec.start_date.month as u32,
-        spec.start_date.day as u32);
+        spec.end_date.year as i32,
+        spec.end_date.month as u32,
+        spec.end_date.day as u32);
+
+    // Check for a start and end dates starting on appropriate week days
 
     let good_start_date = spec.game_weekdays.iter()
         .any(|game_weekdays| game_weekdays.day.to_chrono_weekday() == start_date.weekday());
@@ -96,13 +101,19 @@ pub fn validate(spec: LeagueSpec) {
         .any(|game_weekdays| game_weekdays.day.to_chrono_weekday() == end_date.weekday());
 
     if !good_start_date {
-        println!("The start date does not occur on a day of the week listed.");
+        result.push("The start date does not occur on a day of the week listed.");
     }
     if !good_end_date {
-        println!("The end date does not occur on a day of the week listed.");
+        result.push("The end date does not occur on a day of the week listed.");
     }
 
-    //Make sure all locations are used at least once
+    // Check that start date is before end date
+    if start_date >= end_date {
+        result.push("The start date must occur before end date.");
+    }
+
+    // Make sure all locations are used at least once
+
     let mut used_locations: HashSet<&str> = HashSet::new();
     for game_weekday in spec.game_weekdays.iter() {
         for game_time in game_weekday.game_times.iter() {
@@ -113,7 +124,9 @@ pub fn validate(spec: LeagueSpec) {
     }
 
     if used_locations.ne(&spec.locations.iter().map(|x| x.id.clone()).collect()) {
-        println!("Locations used in game_weekdays are not equal to the list of locations");
+        result.push("Locations used in game_weekdays are not equal to the list of locations");
     }
+
+    result
 
 }
