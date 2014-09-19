@@ -22,7 +22,8 @@ fn main() {
         locations: vec![
             IdAndName { id: "1", name: "name1" },
             IdAndName { id: "2", name: "name2" },
-            IdAndName { id: "3", name: "name3" }
+            IdAndName { id: "3", name: "name3" },
+            IdAndName { id: "4", name: "name4" }
         ],
         start_date: Date {
             day: 16,
@@ -44,25 +45,24 @@ fn main() {
                             min: 0
                         },
                         location_ids: vec![ "1", "2" ]
-                    },
+                    }
+                ]
+            },
+            GameWeekday {
+                day: schedule_gen::Thursday,
+                game_times: vec![
                     GameTime {
                         time: Time {
-                            hour: 17,
+                            hour: 16,
                             min: 0
                         },
-                        location_ids: vec![ "1", "3" ]
-                    },
-                    GameTime {
-                        time: Time {
-                            hour: 18,
-                            min: 0
-                        },
-                        location_ids: vec![ "2", "3" ]
+                        location_ids: vec![ "1", "2", "3", "4" ]
                     }
                 ]
             }
         ]
     };
 
-    println!("errors:\n{}", schedule_gen::validate(thing));
+    println!("errors:\n{}", schedule_gen::validate(&thing));
+    println!("games:\n{}", schedule_gen::generate_games(&thing));
 }

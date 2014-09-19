@@ -16,20 +16,41 @@ pub struct LeagueSpec {
 }
 
 
+#[deriving(Show)]
 pub struct IdAndName {
     pub id: &'static str,
     pub name: &'static str
 }
 
+#[deriving(Show)]
 pub struct Time {
     pub hour: u8,
     pub min: u8
 }
 
+#[deriving(Show)]
 pub struct Date {
     pub day: u8,
     pub month: u8,
     pub year: u16
+}
+
+impl Date {
+    fn to_naive_date_opt(self) -> Option<NaiveDate> {
+        NaiveDate::from_ymd_opt(
+            self.year as i32,
+            self.month as u32,
+            self.day as u32
+        )
+    }
+
+    fn from_naive_date(naive_date: &NaiveDate) -> Date {
+        Date {
+            year: naive_date.year() as u16,
+            month: naive_date.month() as u8,
+            day: naive_date.day() as u8
+        }
+    }
 }
 
 pub struct GameWeekday {
@@ -80,7 +101,45 @@ impl Weekday {
 
 }
 
-pub fn validate(spec: LeagueSpec) -> Vec<&'static str> {
+pub fn generate_games(spec: &LeagueSpec) -> Vec<GameShell> {
+    let errors = validate(spec);
+
+    let mut result: Vec<GameShell> = vec![];
+
+    let start_date = spec.start_date.to_naive_date_opt().unwrap();
+    let end_date = spec.end_date.to_naive_date_opt().unwrap();
+
+    let mut i_date = start_date.clone();
+    while i_date != end_date.succ() {
+        let game_weekday_opt = spec.game_weekdays.iter()
+            .find(|gwd| gwd.day.to_chrono_weekday() == i_date.weekday());
+        if game_weekday_opt.is_some() {
+            let game_weekday = game_weekday_opt.unwrap();
+            for time in game_weekday.game_times.iter() {
+                for location in time.location_ids.iter() {
+                    result.push( GameShell {
+                        date: Date::from_naive_date(&i_date),
+                        time: time.time,
+                        location: *spec.locations.iter().find(|loc| loc.id == *location).unwrap()
+                    });
+                }
+            }
+            println!("i_date: {}", i_date);
+        }
+        i_date = i_date.succ();
+    }
+
+    result
+}
+
+#[deriving(Show)]
+pub struct GameShell {
+    pub date: Date,
+    pub time: Time,
+    pub location: IdAndName
+}
+
+pub fn validate(spec: &LeagueSpec) -> Vec<&'static str> {
 
     let mut result: Vec<&str> = Vec::new();
 
@@ -108,6 +167,9 @@ pub fn validate(spec: LeagueSpec) -> Vec<&'static str> {
             }
             if !good_end_date {
                 result.push("The end date does not occur on a day of the week listed.");
+            }
+            if end_date.succ_opt().is_none() {
+                result.push("The end date occurs too far in the future");
             }
 
             // Check that start date is before end date
@@ -214,12 +276,15 @@ pub fn validate(spec: LeagueSpec) -> Vec<&'static str> {
         spec.game_weekdays.iter()
         .fold(0, |sum, day| sum + 
             day.game_times.iter()
-                .fold(0, |sum2, time| sum2 + time.location_ids.len()));
+            .fold(0, |sum2, time| sum2 + time.location_ids.len()));
 
     if required_games_per_week != actual_games_per_week {
-        result.push("There are a different number of possible games per week than team matchups");
+        result.push(
+            "There are a different number of possible 
+            games per week than team matchups");
     }
 
     result
 
 }
+
