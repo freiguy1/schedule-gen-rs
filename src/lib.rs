@@ -101,8 +101,11 @@ impl Weekday {
 
 }
 
-pub fn generate_games(spec: &LeagueSpec) -> Vec<GameShell> {
+pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<GameShell>, Vec<&'static str>> {
     let errors = validate(spec);
+    if errors.len() > 0 {
+        return Err(errors);
+    }
 
     let mut result: Vec<GameShell> = vec![];
 
@@ -129,7 +132,7 @@ pub fn generate_games(spec: &LeagueSpec) -> Vec<GameShell> {
         i_date = i_date.succ();
     }
 
-    result
+    Ok(result)
 }
 
 #[deriving(Show)]
@@ -139,18 +142,12 @@ pub struct GameShell {
     pub location: IdAndName
 }
 
-pub fn validate(spec: &LeagueSpec) -> Vec<&'static str> {
+fn validate(spec: &LeagueSpec) -> Vec<&'static str> {
 
     let mut result: Vec<&str> = Vec::new();
 
-    let start_date_opt = NaiveDate::from_ymd_opt(
-        spec.start_date.year as i32,
-        spec.start_date.month as u32,
-        spec.start_date.day as u32);
-    let end_date_opt = NaiveDate::from_ymd_opt(
-        spec.end_date.year as i32,
-        spec.end_date.month as u32,
-        spec.end_date.day as u32);
+    let start_date_opt = spec.start_date.to_naive_date_opt();
+    let end_date_opt = spec.end_date.to_naive_date_opt();
 
     match (start_date_opt, end_date_opt) {
         (Some(start_date), Some(end_date)) => {

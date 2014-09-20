@@ -31,7 +31,7 @@ fn main() {
             year: 2014
         },
         end_date: Date {
-            day: 23,
+            day: 25,
             month: 9,
             year: 2014
         },
@@ -63,6 +63,6 @@ fn main() {
         ]
     };
 
-    println!("errors:\n{}", schedule_gen::validate(&thing));
+    //println!("errors:\n{}", schedule_gen::validate(&thing));
     println!("games:\n{}", schedule_gen::generate_games(&thing));
 }
