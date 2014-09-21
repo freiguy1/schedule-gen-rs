@@ -31,36 +31,36 @@ fn main() {
             year: 2014
         },
         end_date: Date {
-            day: 25,
+            day: 23,
             month: 9,
             year: 2014
         },
-        game_weekdays: vec![
-            GameWeekday {
-                day: schedule_gen::Tuesday,
-                game_times: vec![
-                    GameTime {
-                        time: Time {
-                            hour: 16,
-                            min: 0
-                        },
-                        location_ids: vec![ "1", "2" ]
-                    }
-                ]
-            },
-            GameWeekday {
-                day: schedule_gen::Thursday,
-                game_times: vec![
-                    GameTime {
-                        time: Time {
-                            hour: 16,
-                            min: 0
-                        },
-                        location_ids: vec![ "1", "2", "3", "4" ]
-                    }
-                ]
-            }
-        ]
+        game_weekday: GameWeekday {
+            day: schedule_gen::Tuesday,
+            game_times: vec![
+                GameTime {
+                    time: Time {
+                        hour: 16,
+                        min: 0
+                    },
+                    location_ids: vec![ "1", "2" ]
+                },
+                GameTime {
+                    time: Time {
+                        hour: 17,
+                        min: 0
+                    },
+                    location_ids: vec![ "1", "3" ]
+                },
+                GameTime {
+                    time: Time {
+                        hour: 18,
+                        min: 0
+                    },
+                    location_ids: vec![ "3", "4" ]
+                },
+            ]
+        }
     };
 
     //println!("errors:\n{}", schedule_gen::validate(&thing));
