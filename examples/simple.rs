@@ -9,21 +9,13 @@ fn main() {
             IdAndName { id: "1", name: "team1" },
             IdAndName { id: "2", name: "team2" },
             IdAndName { id: "3", name: "team3" },
-            IdAndName { id: "4", name: "team1" },
-            IdAndName { id: "5", name: "team2" },
-            IdAndName { id: "6", name: "team3" },
-            IdAndName { id: "7", name: "team1" },
-            IdAndName { id: "8", name: "team2" },
-            IdAndName { id: "9", name: "team3" },
-            IdAndName { id: "10", name: "team1" },
-            IdAndName { id: "11", name: "team2" },
-            IdAndName { id: "12", name: "team3" },
+            IdAndName { id: "4", name: "team4" },
+            IdAndName { id: "5", name: "team5" },
+            IdAndName { id: "6", name: "team6" }
         ],
         locations: vec![
             IdAndName { id: "1", name: "name1" },
-            IdAndName { id: "2", name: "name2" },
-            IdAndName { id: "3", name: "name3" },
-            IdAndName { id: "4", name: "name4" }
+            IdAndName { id: "2", name: "name2" }
         ],
         start_date: Date {
             day: 16,
@@ -50,19 +42,23 @@ fn main() {
                         hour: 17,
                         min: 0
                     },
-                    location_ids: vec![ "1", "3" ]
-                },
-                GameTime {
-                    time: Time {
-                        hour: 18,
-                        min: 0
-                    },
-                    location_ids: vec![ "3", "4" ]
-                },
+                    location_ids: vec![ "1" ]
+                }
             ]
         }
     };
 
     //println!("errors:\n{}", schedule_gen::validate(&thing));
-    println!("games:\n{}", schedule_gen::generate_games(&thing));
+    match schedule_gen::generate_games(&thing) {
+        Ok(games) => {
+            println!("Success:");
+            for game in games.iter() {
+                println!("{}", game);
+            }
+        }
+        Err(errors) => {
+            println!("Errors:");
+            println!("{}", errors);
+        }
+    }
 }

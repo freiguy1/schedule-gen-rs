@@ -5,6 +5,8 @@ extern crate chrono;
 use chrono::{ NaiveDate, NaiveTime, Datelike };
 use chrono::Weekday as ChronoWeekday;
 
+use std::fmt::{ Show, Formatter, FormatError };
+
 mod validate;
 
 pub struct LeagueSpec {
@@ -107,11 +109,19 @@ impl Weekday {
 
 }
 
-#[deriving(Show)]
 pub struct GameShell {
     pub date: Date,
     pub time: Time,
     pub location: IdAndName
+}
+
+impl Show for GameShell {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
+        write!(f, "{}:{:02} {:04}-{:02}-{:02} at {} (id: {})",
+            self.time.hour, self.time.min,
+            self.date.year, self.date.month, self.date.day,
+            self.location.name, self.location.id)
+    }
 }
 
 
