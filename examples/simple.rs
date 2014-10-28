@@ -6,16 +6,17 @@ fn main() {
 
     let thing = schedule_gen::LeagueSpec {
         teams: vec![
-            IdAndName { id: "1", name: "team1" },
-            IdAndName { id: "2", name: "team2" },
-            IdAndName { id: "3", name: "team3" },
-            IdAndName { id: "4", name: "team4" },
-            IdAndName { id: "5", name: "team5" },
-            IdAndName { id: "6", name: "team6" }
+            IdAndName { id: "1".to_string(), name: "team1".to_string() },
+            IdAndName { id: "2".to_string(), name: "team2".to_string() },
+            IdAndName { id: "3".to_string(), name: "team3".to_string() },
+            IdAndName { id: "4".to_string(), name: "team4".to_string() },
+            IdAndName { id: "5".to_string(), name: "team5".to_string() },
+            IdAndName { id: "6".to_string(), name: "team6".to_string() },
+            IdAndName { id: "7".to_string(), name: "team7".to_string() }
         ],
         locations: vec![
-            IdAndName { id: "1", name: "name1" },
-            IdAndName { id: "2", name: "name2" }
+            IdAndName { id: "1".to_string(), name: "name1".to_string() },
+            IdAndName { id: "2".to_string(), name: "name2".to_string() }
         ],
         start_date: Date {
             day: 16,
@@ -23,8 +24,8 @@ fn main() {
             year: 2014
         },
         end_date: Date {
-            day: 23,
-            month: 9,
+            day: 4,
+            month: 11,
             year: 2014
         },
         game_weekday: GameWeekday {
@@ -35,14 +36,14 @@ fn main() {
                         hour: 16,
                         min: 0
                     },
-                    location_ids: vec![ "1", "2" ]
+                    location_ids: vec![ "1".to_string(), "2".to_string() ]
                 },
                 GameTime {
                     time: Time {
                         hour: 17,
                         min: 0
                     },
-                    location_ids: vec![ "1" ]
+                    location_ids: vec![ "1".to_string() ]
                 }
             ]
         }
@@ -52,9 +53,9 @@ fn main() {
     match schedule_gen::generate_games(&thing) {
         Ok(games) => {
             println!("Success:");
-            for game in games.iter() {
-                println!("{}", game);
-            }
+            //for game in games.iter() {
+                //println!("{}", game);
+            //}
         }
         Err(errors) => {
             println!("Errors:");

@@ -40,7 +40,7 @@ pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
     }
 
     // Make sure all locations are used at least once
-    let mut used_locations: HashSet<&str> = HashSet::new();
+    let mut used_locations: HashSet<String> = HashSet::new();
     for game_time in spec.game_weekday.game_times.iter() {
         for location_id in game_time.location_ids.iter() {
             used_locations.insert(location_id.clone());
@@ -101,7 +101,7 @@ pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
 
     if required_games_per_week != actual_games_per_week {
         result.push(
-            "There are a different number of possible 
+            "There are a different number of possible
             games per week than team matchups");
     }
 

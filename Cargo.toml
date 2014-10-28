@@ -10,4 +10,8 @@ name = "schedule_gen"
 
 [dependencies.chrono]
 
-git = "https://github.com/lifthrasiir/rust-chrono"
+git = "https://github.com/lifthrasiir/rust-chrono.git"
+
+[dependencies.uuid]
+
+git = "https://github.com/rust-lang/uuid.git"
