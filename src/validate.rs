@@ -99,10 +99,9 @@ pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
     let actual_games_per_week = spec.game_weekday.game_times.iter()
         .fold(0, |sum, time| sum + time.location_ids.len());
 
-    if required_games_per_week != actual_games_per_week {
+    if required_games_per_week > actual_games_per_week {
         result.push(
-            "There are a different number of possible
-            games per week than team matchups");
+            "There are less possible game location/time combinations per week than team matchups");
     }
 
     result

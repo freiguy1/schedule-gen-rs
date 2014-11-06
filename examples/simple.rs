@@ -43,7 +43,7 @@ fn main() {
                         hour: 17,
                         min: 0
                     },
-                    location_ids: vec![ "1".to_string() ]
+                    location_ids: vec![ "1".to_string(), "2".to_string() ]
                 }
             ]
         }

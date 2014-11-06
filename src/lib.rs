@@ -133,21 +133,14 @@ pub enum TeamEvent {
     Bye(IdAndName, Date)
 }
 
-impl TeamEvent {
-    fn date(&self) -> Date {
-        match *self {
-            Game(_, _, date, _, _) => date,
-            Bye(_, date) => date
-        }
-    }
-}
 
 pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static str>> {
-    let game_shells_result = generate_shells(spec);
-    if game_shells_result.is_err() {
-        return Err(game_shells_result.err().unwrap());
+    let errors = validate::validate(spec);
+    if errors.len() > 0 {
+        return Err(errors);
     }
-    let game_shells = game_shells_result.ok().unwrap();
+
+    let game_shells = generate_shells(spec);
 
     // Create a new list of teams which includes our fake bye team if needed
     let mut teams = spec.teams.clone();
@@ -162,59 +155,55 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
     }
     let teams = teams;
     let bye_id = bye_id;
-    let rotation_size = teams.len() - 1;
-    let games_per_night = teams.len() / 2;
 
-    // A set of all two team combinations
-    let mut two_team_sets: Vec<(IdAndName, IdAndName)> = vec![];
-    for i in range(0, teams.len()) {
-        for j in range(i + 1, teams.len()) {
-            two_team_sets.push((teams[i].clone(), teams[j].clone()));
+    let round_robin = generate_round_robin(&teams);
+    
+    println!("thing: {0}", game_shells.len());
+
+    for rotation in game_shells.as_slice().chunks((teams.len() - 1) * (spec.teams.len() / 2)) {
+        println!("rotation size: {0}", rotation.len());
+        println!("New Rotation");
+        for round in rotation.as_slice().chunks(spec.teams.len() / 2) {
+            println!("\tNew Round");
+            for shell in round.iter() {
+                println!("\t\t{0}", shell);
+            }
         }
     }
-
-    let mut game_shells_by_date: Vec<Vec<GameShell>> = vec!();
-
-    let mut last_date = game_shells[0].date;
-    let mut game_shell_date_builder: Vec<GameShell> = vec!();
-    for game_shell in game_shells.iter() {
-        if last_date != game_shell.date  {
-            game_shells_by_date.push(game_shell_date_builder.clone());
-            game_shell_date_builder = vec!();
-            last_date = game_shell.date;
-        }
-        game_shell_date_builder.push(game_shell.clone());
-    }
-    game_shells_by_date.push(game_shell_date_builder.clone());
-
-    // Rotations(Days(Games))
-    let mut game_shells_by_rotation: Vec<Vec<Vec<GameShell>>> = vec!();
-    let mut rotation_counter = 0u;
-    let mut game_shell_rotation_builder: Vec<Vec<GameShell>> = vec!();
-    for game_shells in game_shells_by_date.iter() {
-        if rotation_counter == rotation_size {
-            rotation_counter = 0;
-            game_shells_by_rotation.push(game_shell_rotation_builder);
-            game_shell_rotation_builder = vec!();
-        }
-        game_shell_rotation_builder.push(game_shells.clone());
-        rotation_counter += 1;
-    }
-
-    game_shells_by_rotation.push(game_shell_rotation_builder);
-
-    println!("Game Shells By Rotation: {}", game_shells_by_rotation);
-    println!("Len: {}. thing[0].len(): {}. thing[1].len(): {})", game_shells_by_rotation.len(), game_shells_by_rotation[0].len(), game_shells_by_rotation[1].len());
 
     Ok(vec!())
-
 }
 
-fn generate_shells(spec: &LeagueSpec) -> Result<Vec<GameShell>, Vec<&'static str>> {
-    let errors = validate::validate(spec);
-    if errors.len() > 0 {
-        return Err(errors);
+fn generate_round_robin(teams: &Vec<IdAndName>) -> Vec<Vec<(&IdAndName, &IdAndName)>> {
+    let static_team: &IdAndName = &teams[0];
+    let mut other_teams: Vec<&IdAndName> = teams.iter().skip(1).collect();
+
+    let mut result: Vec<Vec<(&IdAndName, &IdAndName)>> = Vec::new();
+
+    for _ in range(0u, teams.len() - 1) {
+        let mut session: Vec<(&IdAndName, &IdAndName)> = Vec::new();
+        session.push((other_teams[0], static_team));
+        for i in range(0u, (other_teams.len() - 1) / 2) {
+            let team_1: &IdAndName = other_teams[i+1];
+            let team_2: &IdAndName = other_teams[other_teams.len() - 1 - i];
+            session.push((team_1, team_2));
+        }
+
+        // Rotate other_teams
+        let temp = other_teams[0];
+        for i in range(0u, other_teams.len() - 1) {
+            other_teams[i] = other_teams[i + 1];
+        }
+        other_teams[other_teams.len() - 1] = temp;
+
+        result.push(session)
     }
+
+    result
+}
+
+fn generate_shells(spec: &LeagueSpec) -> Vec<GameShell> {
+    let games_per_night = spec.teams.len() as u8 / 2;
 
     let mut result: Vec<GameShell> = vec![];
 
@@ -224,18 +213,22 @@ fn generate_shells(spec: &LeagueSpec) -> Result<Vec<GameShell>, Vec<&'static str
     let mut i_date = start_date.clone();
     while i_date != end_date.succ() {
         if spec.game_weekday.day.to_chrono_weekday() == i_date.weekday() {
+            let mut num_games = 0u8;
             for time in spec.game_weekday.game_times.iter() {
                 for location in time.location_ids.iter() {
-                    result.push( GameShell {
-                        date: Date::from_naive_date(&i_date),
-                        time: time.time,
-                        location: spec.locations.iter().find(|loc| loc.id == *location).unwrap().clone()
-                    });
+                    if num_games != games_per_night {
+                        result.push( GameShell {
+                            date: Date::from_naive_date(&i_date),
+                            time: time.time,
+                            location: spec.locations.iter().find(|loc| loc.id == *location).unwrap().clone()
+                        });
+                        num_games += 1;
+                    }
                 }
             }
         }
         i_date = i_date.succ();
     }
 
-    Ok(result)
+    result
 }
