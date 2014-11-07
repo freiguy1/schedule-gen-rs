@@ -9,6 +9,7 @@ use chrono::Weekday as ChronoWeekday;
 use uuid::Uuid;
 
 use std::fmt::{ Show, Formatter, FormatError };
+use std::rand::{task_rng, Rng};
 
 
 mod validate;
@@ -144,29 +145,43 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
 
     // Create a new list of teams which includes our fake bye team if needed
     let mut teams = spec.teams.clone();
-    let mut bye_id: Option<String> = None;
+    let mut bye_id_opt: Option<String> = None;
     let generated_uuid = Uuid::new_v4().to_hyphenated_string();
     if teams.len() % 2 == 1 {
-        bye_id = Some(generated_uuid.clone());
+        bye_id_opt = Some(generated_uuid.clone());
         teams.push(IdAndName {
             name: String::from_str("Bye team"),
             id: generated_uuid
         });
     }
     let teams = teams;
-    let bye_id = bye_id;
+    let bye_id_opt: Option<String> = bye_id_opt;
 
-    let round_robin = generate_round_robin(&teams);
-    
-    println!("thing: {0}", game_shells.len());
+    let mut round_robin = generate_round_robin(&teams);
+    let mut rng = task_rng();
 
     for rotation in game_shells.as_slice().chunks((teams.len() - 1) * (spec.teams.len() / 2)) {
-        println!("rotation size: {0}", rotation.len());
         println!("New Rotation");
-        for round in rotation.as_slice().chunks(spec.teams.len() / 2) {
-            println!("\tNew Round");
-            for shell in round.iter() {
-                println!("\t\t{0}", shell);
+        rng.shuffle(round_robin.as_mut_slice());
+        for shells_teams in rotation.as_slice().chunks(spec.teams.len() / 2).zip(round_robin.iter_mut()) {
+            let (shells, teams) = shells_teams;
+            rng.shuffle(teams.as_mut_slice());
+            println!("\tNew Week");
+            let non_byes = match bye_id_opt {
+                Some(ref bye_id) => {
+                    let bye_pair = teams.iter().find(|pair| pair.val0().id == *bye_id || pair.val1().id == *bye_id).unwrap();
+                    if bye_pair.val0().id == *bye_id {
+                        println!("\t\t{0} has bye", bye_pair.val1());
+                    } else {
+                        println!("\t\t{0} has bye", bye_pair.val0());
+                    }
+                    teams.iter().filter(|pair| pair.val0().id != *bye_id && pair.val1().id != *bye_id).collect::<Vec<_>>()
+                }
+                None => teams.iter().collect::<Vec<_>>()
+            };
+            for shell_team in shells.iter().zip(non_byes.iter()) {
+                let (shell, team) = shell_team;
+                println!("\t\t{0}|{1}", shell, team)
             }
         }
     }
@@ -194,7 +209,8 @@ fn generate_round_robin(teams: &Vec<IdAndName>) -> Vec<Vec<(&IdAndName, &IdAndNa
         for i in range(0u, other_teams.len() - 1) {
             other_teams[i] = other_teams[i + 1];
         }
-        other_teams[other_teams.len() - 1] = temp;
+        let other_teams_len = other_teams.len() - 1;
+        other_teams[other_teams_len] = temp;
 
         result.push(session)
     }
