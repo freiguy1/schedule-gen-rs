@@ -122,7 +122,7 @@ pub struct GameShell {
 
 impl Show for GameShell {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
-        write!(f, "{}:{:02} {:04}-{:02}-{:02} at {} (id: {})",
+        write!(f, "{}:{:02} {:04}-{:02}-{:02} on {} (id: {})",
             self.time.hour, self.time.min,
             self.date.year, self.date.month, self.date.day,
             self.location.name, self.location.id)
@@ -158,22 +158,20 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
     let bye_id_opt: Option<String> = bye_id_opt;
 
     let mut round_robin = generate_round_robin(&teams);
-    let mut rng = task_rng();
 
     for rotation in game_shells.as_slice().chunks((teams.len() - 1) * (spec.teams.len() / 2)) {
         println!("New Rotation");
-        rng.shuffle(round_robin.as_mut_slice());
-        for shells_teams in rotation.as_slice().chunks(spec.teams.len() / 2).zip(round_robin.iter_mut()) {
+        shuffle_round_robin(&mut round_robin);
+        for shells_teams in rotation.as_slice().chunks(spec.teams.len() / 2).zip(round_robin.iter()) {
             let (shells, teams) = shells_teams;
-            rng.shuffle(teams.as_mut_slice());
             println!("\tNew Week");
             let non_byes = match bye_id_opt {
                 Some(ref bye_id) => {
                     let bye_pair = teams.iter().find(|pair| pair.val0().id == *bye_id || pair.val1().id == *bye_id).unwrap();
                     if bye_pair.val0().id == *bye_id {
-                        println!("\t\t{0} has bye", bye_pair.val1());
+                        println!("\t\t{0} has bye", bye_pair.val1().name);
                     } else {
-                        println!("\t\t{0} has bye", bye_pair.val0());
+                        println!("\t\t{0} has bye", bye_pair.val0().name);
                     }
                     teams.iter().filter(|pair| pair.val0().id != *bye_id && pair.val1().id != *bye_id).collect::<Vec<_>>()
                 }
@@ -181,12 +179,30 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
             };
             for shell_team in shells.iter().zip(non_byes.iter()) {
                 let (shell, team) = shell_team;
-                println!("\t\t{0}|{1}", shell, team)
+                println!("\t\t{0} vs {1} at {2}", team.val0().name, team.val1().name, shell);
             }
         }
     }
 
     Ok(vec!())
+}
+
+fn shuffle_round_robin(
+    round_robin: &mut Vec<Vec<(&IdAndName, &IdAndName)>>) {
+    let mut rng = task_rng();
+    let pair: (&IdAndName, &IdAndName) = round_robin[round_robin.len() - 1][0];
+    rng.shuffle(round_robin.as_mut_slice());
+    while round_robin[0].iter().any(|pair2| 
+        (pair2.val0().id == pair.val0().id &&
+        pair2.val1().id == pair.val1().id) ||
+        (pair2.val1().id == pair.val0().id &&
+        pair2.val0().id == pair.val1().id)) {
+        rng.shuffle(round_robin.as_mut_slice());
+    }
+
+    for week in round_robin.iter_mut() {
+        rng.shuffle(week.as_mut_slice());
+    }
 }
 
 fn generate_round_robin(teams: &Vec<IdAndName>) -> Vec<Vec<(&IdAndName, &IdAndName)>> {

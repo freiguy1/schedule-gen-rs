@@ -19,7 +19,7 @@ pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
                 result.push("The start date does not occur on the day of the week.");
             }
             if !good_end_date {
-                result.push("The end date does not occur on the day of the week.");
+                result.push("The end date does not occur on the start day of the week.");
             }
             if end_date.succ_opt().is_none() {
                 result.push("The end date occurs too far in the future");

@@ -10,13 +10,12 @@ fn main() {
             IdAndName { id: "2".to_string(), name: "team2".to_string() },
             IdAndName { id: "3".to_string(), name: "team3".to_string() },
             IdAndName { id: "4".to_string(), name: "team4".to_string() },
-            IdAndName { id: "5".to_string(), name: "team5".to_string() },
-            IdAndName { id: "6".to_string(), name: "team6".to_string() },
-            IdAndName { id: "7".to_string(), name: "team7".to_string() }
+            IdAndName { id: "7".to_string(), name: "team7".to_string() },
+            IdAndName { id: "8".to_string(), name: "team8".to_string() }
         ],
         locations: vec![
-            IdAndName { id: "1".to_string(), name: "name1".to_string() },
-            IdAndName { id: "2".to_string(), name: "name2".to_string() }
+            IdAndName { id: "1".to_string(), name: "field1".to_string() },
+            IdAndName { id: "2".to_string(), name: "field2".to_string() }
         ],
         start_date: Date {
             day: 16,
@@ -24,8 +23,8 @@ fn main() {
             year: 2014
         },
         end_date: Date {
-            day: 4,
-            month: 11,
+            day: 23,
+            month: 12,
             year: 2014
         },
         game_weekday: GameWeekday {
