@@ -1,6 +1,6 @@
 extern crate schedule_gen;
 
-use schedule_gen::{ Date, GameWeekday, IdAndName, GameTime, Time };
+use schedule_gen::{ Date, GameWeekday, IdAndName, GameTime, Time, Game, Bye };
 
 fn main() {
 
@@ -10,6 +10,7 @@ fn main() {
             IdAndName { id: "2".to_string(), name: "team2".to_string() },
             IdAndName { id: "3".to_string(), name: "team3".to_string() },
             IdAndName { id: "4".to_string(), name: "team4".to_string() },
+            IdAndName { id: "5".to_string(), name: "team5".to_string() },
             IdAndName { id: "7".to_string(), name: "team7".to_string() },
             IdAndName { id: "8".to_string(), name: "team8".to_string() }
         ],
@@ -48,13 +49,20 @@ fn main() {
         }
     };
 
-    //println!("errors:\n{}", schedule_gen::validate(&thing));
     match schedule_gen::generate_games(&thing) {
         Ok(games) => {
             println!("Success:");
-            //for game in games.iter() {
-                //println!("{}", game);
-            //}
+            for game in games.iter() {
+                match game {
+                    &Game(ref home_team, ref away_team, ref date, ref time, ref location) => {
+                        println!("Home: {0}, Away: {1}. Date: {2}. Time: {3}. Location: {4}",
+                            home_team, away_team, date, time, location);
+                    }
+                    &Bye(ref team, ref date) => {
+                        println!("Bye team: {0}, date: {1}", team, date);
+                    }
+                }
+            }
         }
         Err(errors) => {
             println!("Errors:");

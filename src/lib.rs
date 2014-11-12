@@ -159,19 +159,20 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
 
     let mut round_robin = generate_round_robin(&teams);
 
+    let mut result: Vec<TeamEvent> = vec!();
+
     for rotation in game_shells.as_slice().chunks((teams.len() - 1) * (spec.teams.len() / 2)) {
-        println!("New Rotation");
         shuffle_round_robin(&mut round_robin);
         for shells_teams in rotation.as_slice().chunks(spec.teams.len() / 2).zip(round_robin.iter()) {
             let (shells, teams) = shells_teams;
-            println!("\tNew Week");
             let non_byes = match bye_id_opt {
                 Some(ref bye_id) => {
+                    let bye_date = shells[0].date.clone();
                     let bye_pair = teams.iter().find(|pair| pair.val0().id == *bye_id || pair.val1().id == *bye_id).unwrap();
                     if bye_pair.val0().id == *bye_id {
-                        println!("\t\t{0} has bye", bye_pair.val1().name);
+                        result.push(Bye(bye_pair.val1().clone(), bye_date));
                     } else {
-                        println!("\t\t{0} has bye", bye_pair.val0().name);
+                        result.push(Bye(bye_pair.val0().clone(), bye_date));
                     }
                     teams.iter().filter(|pair| pair.val0().id != *bye_id && pair.val1().id != *bye_id).collect::<Vec<_>>()
                 }
@@ -179,12 +180,17 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
             };
             for shell_team in shells.iter().zip(non_byes.iter()) {
                 let (shell, team) = shell_team;
-                println!("\t\t{0} vs {1} at {2}", team.val0().name, team.val1().name, shell);
+                result.push(Game(
+                    team.val0().clone(), 
+                    team.val1().clone(), 
+                    shell.date.clone(),
+                    shell.time.clone(),
+                    shell.location.clone()));
             }
         }
     }
 
-    Ok(vec!())
+    Ok(result)
 }
 
 fn shuffle_round_robin(
