@@ -1,54 +1,32 @@
 #![crate_name = "schedule_gen"]
 
-extern crate chrono;
 extern crate uuid;
-
-use chrono::{ NaiveDate, NaiveTime, Datelike };
-use chrono::Weekday as ChronoWeekday;
+extern crate chrono;
 
 use uuid::Uuid;
 
-use std::fmt::{ Show, Formatter, FormatError };
+use chrono::{ NaiveTime, NaiveDate, Datelike };
+
 use std::rand::{task_rng, Rng};
 
+use self::structs::{ TeamEvent, GameShell };
+
+pub use self::structs::{ LeagueSpec, Date, GameWeekday, IdAndName, GameTime, Time, Game, Bye };
+pub use self::structs::{ Weekday, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
 
 mod validate;
+mod structs;
 
-pub struct LeagueSpec {
-    pub teams: Vec<IdAndName>,
-    pub locations: Vec<IdAndName>,
-    pub start_date: Date,
-    pub end_date: Date,
-    pub game_weekday: GameWeekday
+// We need date extension methods here beacuse we don't want to make
+// them public (they deal with referenced library), yet we want them
+// available to everything below me.
+trait DateExtensions {
+    fn to_naive_date_opt(self) -> Option<NaiveDate>;
+    fn from_naive_date(naive_date: &NaiveDate) -> Date;
 }
 
+impl DateExtensions for Date {
 
-#[deriving(Show, Clone)]
-pub struct IdAndName {
-    pub id: String,
-    pub name: String
-}
-
-#[deriving(Show, Clone)]
-pub struct Time {
-    pub hour: u8,
-    pub min: u8
-}
-
-impl Time {
-    fn to_naive_time_opt(self) -> Option<NaiveTime> {
-        NaiveTime::from_hms_opt(self.hour as u32, self.min as u32, 0)
-    }
-}
-
-#[deriving(Show, Eq, PartialEq, Clone)]
-pub struct Date {
-    pub day: u8,
-    pub month: u8,
-    pub year: u16
-}
-
-impl Date {
     fn to_naive_date_opt(self) -> Option<NaiveDate> {
         NaiveDate::from_ymd_opt(
             self.year as i32,
@@ -66,74 +44,15 @@ impl Date {
     }
 }
 
-pub struct GameWeekday {
-    pub day: Weekday,
-    pub game_times: Vec<GameTime>
+trait TimeExtensions {
+    fn to_naive_time_opt(self) -> Option<NaiveTime>;
 }
 
-pub struct GameTime {
-    pub time: Time,
-    pub location_ids: Vec<String>
-}
-
-pub enum Weekday {
-    Sunday,
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday
-}
-
-impl Weekday {
-
-    pub fn to_chrono_weekday(&self) -> ChronoWeekday {
-        match *self {
-            Sunday => chrono::Sun,
-            Monday => chrono::Mon,
-            Tuesday => chrono::Tue,
-            Wednesday => chrono::Wed,
-            Thursday => chrono::Thu,
-            Friday => chrono::Fri,
-            Saturday => chrono::Sat
-        }
-    }
-
-    pub fn from_chrono_weekday(chrono_weekday: ChronoWeekday) -> Weekday {
-        match chrono_weekday {
-            chrono::Sun => Sunday,
-            chrono::Mon => Monday,
-            chrono::Tue => Tuesday,
-            chrono::Wed => Wednesday,
-            chrono::Thu => Thursday,
-            chrono::Fri => Friday,
-            chrono::Sat => Saturday
-        }
+impl TimeExtensions for Time {
+    fn to_naive_time_opt(self) -> Option<NaiveTime> {
+        NaiveTime::from_hms_opt(self.hour as u32, self.min as u32, 0)
     }
 }
-
-#[deriving(Clone)]
-pub struct GameShell {
-    pub date: Date,
-    pub time: Time,
-    pub location: IdAndName
-}
-
-impl Show for GameShell {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
-        write!(f, "{}:{:02} {:04}-{:02}-{:02} on {} (id: {})",
-            self.time.hour, self.time.min,
-            self.date.year, self.date.month, self.date.day,
-            self.location.name, self.location.id)
-    }
-}
-
-pub enum TeamEvent {
-    Game(IdAndName, IdAndName, Date, Time, IdAndName),
-    Bye(IdAndName, Date)
-}
-
 
 pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static str>> {
     let errors = validate::validate(spec);
@@ -256,7 +175,7 @@ fn generate_shells(spec: &LeagueSpec) -> Vec<GameShell> {
                 for location in time.location_ids.iter() {
                     if num_games != games_per_night {
                         result.push( GameShell {
-                            date: Date::from_naive_date(&i_date),
+                            date: DateExtensions::from_naive_date(&i_date),
                             time: time.time,
                             location: spec.locations.iter().find(|loc| loc.id == *location).unwrap().clone()
                         });

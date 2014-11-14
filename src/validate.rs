@@ -2,6 +2,8 @@ use std::collections::HashSet;
 
 use chrono::Datelike;
 
+use { DateExtensions, TimeExtensions };
+
 pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
 
     let mut result: Vec<&str> = Vec::new();
