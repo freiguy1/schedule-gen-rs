@@ -12,8 +12,8 @@ fn main() {
             ("3".to_string(), "team3".to_string()),
             ("4".to_string(), "team4".to_string()),
             ("5".to_string(), "team5".to_string()),
-            ("7".to_string(), "team7".to_string()),
-            ("8".to_string(), "team8".to_string())
+            ("6".to_string(), "team6".to_string()),
+            ("7".to_string(), "team7".to_string())
         ],
         locations: vec![
             ("1".to_string(), "field1".to_string()),

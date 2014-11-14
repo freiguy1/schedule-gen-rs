@@ -88,7 +88,7 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
     let generated_uuid = Uuid::new_v4().to_hyphenated_string();
     if teams.len() % 2 == 1 {
         bye_id_opt = Some(generated_uuid.clone());
-        teams.push((String::from_str("Bye team"), generated_uuid));
+        teams.push((generated_uuid, String::from_str("Bye team")));
     }
     let teams = teams;
     let bye_id_opt: Option<String> = bye_id_opt;
@@ -104,13 +104,13 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
             let non_byes = match bye_id_opt {
                 Some(ref bye_id) => {
                     let bye_date = shells[0].date.clone();
-                    let bye_pair = teams.iter().find(|pair| pair.ref0().ref0() == bye_id || pair.ref0().ref0() == bye_id).unwrap();
+                    let bye_pair = teams.iter().find(|pair| pair.ref0().ref0() == bye_id || pair.ref1().ref0() == bye_id).unwrap();
                     if bye_pair.ref0().ref0() == bye_id {
                         result.push(Bye(bye_pair.val1().clone(), bye_date));
                     } else {
                         result.push(Bye(bye_pair.val0().clone(), bye_date));
                     }
-                    teams.iter().filter(|pair| pair.ref0().ref0() != bye_id && pair.ref0().ref0() != bye_id).collect::<Vec<_>>()
+                    teams.iter().filter(|pair| pair.ref0().ref0() != bye_id && pair.ref1().ref0() != bye_id).collect::<Vec<_>>()
                 }
                 None => teams.iter().collect::<Vec<_>>()
             };
