@@ -1,5 +1,4 @@
 
-use chrono::Weekday as ChronoWeekday;
 
 pub struct LeagueSpec {
     pub teams: Vec<(String, String)>,
@@ -41,31 +40,3 @@ pub enum Weekday {
     Saturday
 }
 
-impl Weekday {
-
-    pub fn to_chrono_weekday(&self) -> ChronoWeekday {
-        match *self {
-            Sunday => ::chrono::Sun,
-            Monday => ::chrono::Mon,
-            Tuesday => ::chrono::Tue,
-            Wednesday => ::chrono::Wed,
-            Thursday => ::chrono::Thu,
-            Friday => ::chrono::Fri,
-            Saturday => ::chrono::Sat
-        }
-    }
-
-
-    pub fn from_chrono_weekday(chrono_weekday: ChronoWeekday) -> Weekday {
-        match chrono_weekday {
-            ::chrono::Sun => Sunday,
-            ::chrono::Mon => Monday,
-            ::chrono::Tue => Tuesday,
-            ::chrono::Wed => Wednesday,
-            ::chrono::Thu => Thursday,
-            ::chrono::Fri => Friday,
-            ::chrono::Sat => Saturday
-        }
-    }
-
-}

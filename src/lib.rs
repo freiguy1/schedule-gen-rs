@@ -5,13 +5,15 @@ extern crate chrono;
 
 use uuid::Uuid;
 
-use chrono::{ NaiveTime, NaiveDate, Datelike };
+use chrono::Datelike;
 
 use std::rand::{task_rng, Rng};
 use std::fmt::{ Show, Formatter, FormatError };
 
 use contract::{ Time, Date, LeagueSpec };
+use convert::{ DateConvert, WeekdayConvert };
 
+mod convert;
 mod validate;
 pub mod contract;
 
@@ -37,42 +39,6 @@ impl Show for GameShell {
     }
 }
 
-// We need date extension methods here beacuse we don't want to make
-// them public (they deal with referenced library), yet we want them
-// available to everything below me.
-trait DateExtensions {
-    fn to_naive_date_opt(self) -> Option<NaiveDate>;
-    fn from_naive_date(naive_date: &NaiveDate) -> Date;
-}
-
-impl DateExtensions for Date {
-
-    fn to_naive_date_opt(self) -> Option<NaiveDate> {
-        NaiveDate::from_ymd_opt(
-            self.year as i32,
-            self.month as u32,
-            self.day as u32
-        )
-    }
-
-    fn from_naive_date(naive_date: &NaiveDate) -> Date {
-        Date {
-            year: naive_date.year() as u16,
-            month: naive_date.month() as u8,
-            day: naive_date.day() as u8
-        }
-    }
-}
-
-trait TimeExtensions {
-    fn to_naive_time_opt(self) -> Option<NaiveTime>;
-}
-
-impl TimeExtensions for Time {
-    fn to_naive_time_opt(self) -> Option<NaiveTime> {
-        NaiveTime::from_hms_opt(self.hour as u32, self.min as u32, 0)
-    }
-}
 
 pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static str>> {
     let errors = validate::validate(spec);
@@ -192,7 +158,7 @@ fn generate_shells(spec: &LeagueSpec) -> Vec<GameShell> {
                 for location in time.location_ids.iter() {
                     if num_games != games_per_night {
                         result.push( GameShell {
-                            date: DateExtensions::from_naive_date(&i_date),
+                            date: convert::DateConvert::from_naive_date(&i_date),
                             time: time.time,
                             location: spec.locations.iter().find(|loc| loc.ref0() == location).unwrap().clone()
                         });

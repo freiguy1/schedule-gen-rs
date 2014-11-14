@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use chrono::Datelike;
 
-use { DateExtensions, TimeExtensions };
+use convert::{ DateConvert, TimeConvert, WeekdayConvert };
 
 pub fn validate(spec: &::contract::LeagueSpec) -> Vec<&'static str> {
 
