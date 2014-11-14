@@ -4,7 +4,7 @@ use chrono::Datelike;
 
 use { DateExtensions, TimeExtensions };
 
-pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
+pub fn validate(spec: &::contract::LeagueSpec) -> Vec<&'static str> {
 
     let mut result: Vec<&str> = Vec::new();
 
@@ -49,7 +49,7 @@ pub fn validate(spec: &::LeagueSpec) -> Vec<&'static str> {
         }
     }
 
-    if used_locations.ne(&spec.locations.iter().map(|x| x.id.clone()).collect()) {
+    if used_locations.ne(&spec.locations.iter().map(|x| x.ref0().clone()).collect()) {
         result.push("Locations used in game_weekday are not equal to the list of locations");
     }
 

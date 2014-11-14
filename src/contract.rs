@@ -1,21 +1,12 @@
 
 use chrono::Weekday as ChronoWeekday;
 
-use std::fmt::{ Show, Formatter, FormatError };
-
 pub struct LeagueSpec {
-    pub teams: Vec<IdAndName>,
-    pub locations: Vec<IdAndName>,
+    pub teams: Vec<(String, String)>,
+    pub locations: Vec<(String, String)>,
     pub start_date: Date,
     pub end_date: Date,
     pub game_weekday: GameWeekday
-}
-
-
-#[deriving(Show, Clone)]
-pub struct IdAndName {
-    pub id: String,
-    pub name: String
 }
 
 #[deriving(Show, Clone)]
@@ -64,7 +55,7 @@ impl Weekday {
         }
     }
 
-    
+
     pub fn from_chrono_weekday(chrono_weekday: ChronoWeekday) -> Weekday {
         match chrono_weekday {
             ::chrono::Sun => Sunday,
@@ -76,26 +67,5 @@ impl Weekday {
             ::chrono::Sat => Saturday
         }
     }
-    
-}
 
-#[deriving(Clone)]
-pub struct GameShell {
-    pub date: Date,
-    pub time: Time,
-    pub location: IdAndName
-}
-
-impl Show for GameShell {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
-        write!(f, "{}:{:02} {:04}-{:02}-{:02} on {} (id: {})",
-            self.time.hour, self.time.min,
-            self.date.year, self.date.month, self.date.day,
-            self.location.name, self.location.id)
-    }
-}
-
-pub enum TeamEvent {
-    Game(IdAndName, IdAndName, Date, Time, IdAndName),
-    Bye(IdAndName, Date)
 }
