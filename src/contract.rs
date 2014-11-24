@@ -1,5 +1,4 @@
 
-
 pub struct LeagueSpec {
     pub teams: Vec<(String, String)>,
     pub locations: Vec<(String, String)>,
@@ -14,12 +13,14 @@ pub struct Time {
     pub min: u8
 }
 
-#[deriving(Show, Eq, PartialEq, Clone, Hash)]
+#[deriving(Show, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub struct Date {
-    pub day: u8,
+    pub year: u16,
     pub month: u8,
-    pub year: u16
+    pub day: u8
 }
+
+
 pub struct GameWeekday {
     pub day: Weekday,
     pub game_times: Vec<GameTime>

@@ -1,8 +1,9 @@
 extern crate schedule_gen;
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
-use schedule_gen::contract::{ Date, GameWeekday, GameTime, Time, TeamEvent, Game, Bye };
+use schedule_gen::contract::{ Date, GameWeekday, GameTime, Time, TeamEvent };
+use schedule_gen::contract::TeamEvent::{ Game, Bye };
 
 fn main() {
 
@@ -53,27 +54,30 @@ fn main() {
 
     match schedule_gen::generate_games(&thing) {
         Ok(games) => {
-            let games_by_date = games.iter().fold::<HashMap<&Date, Vec<&TeamEvent>>>(HashMap::new(), |map, &game| {
-                if map.contains_key(&game.get_date()) {
-                    println!("has date in map");
-                    map.get_mut(game.get_date()).unwrap().push(game);
-                } else {
-                    println!("doesn't have date in map");
-                    map.insert(&game.get_date(), vec![game]);
-                }
-                
-            });
             println!("Success:");
-            for game in games.iter() {
-                match game {
-                    &Game(ref home_team, ref away_team, ref date, ref time, ref location) => {
-                        println!("Home: {0}, Away: {1}. Date: {2}. Time: {3}. Location: {4}",
-                            home_team, away_team, date, time, location);
-                    }
-                    &Bye(ref team, ref date) => {
-                        println!("Bye team: {0}, date: {1}", team, date);
+            let games_by_date = games.iter().fold::<BTreeMap<Date, Vec<&TeamEvent>>>(BTreeMap::new(), |mut map, game| {
+                if map.contains_key(&game.get_date()) {
+                    map.get_mut(&game.get_date()).unwrap().push(game);
+                } else {
+                    map.insert(game.get_date(), vec![game]);
+                }
+                map
+            });
+
+            for (date, events) in games_by_date.iter() {
+                println!("Date: {}", date);
+                for event in events.iter() {
+                    match event {
+                        &&Game(ref home_team, ref away_team, _, ref time, ref location) => {
+                            println!("\tHome: {}, Away: {}. Time: {}. Location: {}",
+                                home_team, away_team, time, location);
+                        }
+                        &&Bye(ref team, _) => {
+                            println!("\tBye team: {}", team);
+                        }
                     }
                 }
+                println!("");
             }
         }
         Err(errors) => {
