@@ -8,9 +8,9 @@ use uuid::Uuid;
 use chrono::Datelike;
 
 use std::rand::{task_rng, Rng};
-use std::fmt::{ Show, Formatter, FormatError };
 
-use contract::{ Time, Date, LeagueSpec };
+use contract::{ Time, Date, LeagueSpec, TeamEvent };
+use contract::TeamEvent::{ Game, Bye };
 use convert::{ DateConvert, WeekdayConvert };
 
 mod convert;
@@ -18,27 +18,12 @@ mod validate;
 pub mod contract;
 
 
-pub enum TeamEvent {
-    Game((String, String), (String, String), Date, Time, (String, String)),
-    Bye((String, String), Date)
-}
-
 #[deriving(Clone)]
 struct GameShell {
     pub date: Date,
     pub time: Time,
     pub location: (String, String)
 }
-
-impl Show for GameShell {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
-        write!(f, "{}:{:02} {:04}-{:02}-{:02} on {} (id: {})",
-            self.time.hour, self.time.min,
-            self.date.year, self.date.month, self.date.day,
-            self.location.ref1(), self.location.ref0())
-    }
-}
-
 
 pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static str>> {
     let errors = validate::validate(spec);

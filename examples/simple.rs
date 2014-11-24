@@ -1,7 +1,8 @@
 extern crate schedule_gen;
 
-use schedule_gen::contract::{ Date, GameWeekday, GameTime, Time };
-use schedule_gen::{ Game, Bye };
+use std::collections::HashMap;
+
+use schedule_gen::contract::{ Date, GameWeekday, GameTime, Time, TeamEvent, Game, Bye };
 
 fn main() {
 
@@ -52,6 +53,16 @@ fn main() {
 
     match schedule_gen::generate_games(&thing) {
         Ok(games) => {
+            let games_by_date = games.iter().fold::<HashMap<&Date, Vec<&TeamEvent>>>(HashMap::new(), |map, &game| {
+                if map.contains_key(&game.get_date()) {
+                    println!("has date in map");
+                    map.get_mut(game.get_date()).unwrap().push(game);
+                } else {
+                    println!("doesn't have date in map");
+                    map.insert(&game.get_date(), vec![game]);
+                }
+                
+            });
             println!("Success:");
             for game in games.iter() {
                 match game {

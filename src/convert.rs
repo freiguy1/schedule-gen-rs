@@ -46,25 +46,25 @@ pub trait WeekdayConvert {
 impl WeekdayConvert for Weekday {
     fn to_chrono_weekday(&self) -> ChronoWeekday {
         match *self {
-            ::contract::Sunday => ::chrono::Sun,
-            ::contract::Monday => ::chrono::Mon,
-            ::contract::Tuesday => ::chrono::Tue,
-            ::contract::Wednesday => ::chrono::Wed,
-            ::contract::Thursday => ::chrono::Thu,
-            ::contract::Friday => ::chrono::Fri,
-            ::contract::Saturday => ::chrono::Sat
+            ::contract::Weekday::Sunday => ::chrono::Sun,
+            ::contract::Weekday::Monday => ::chrono::Mon,
+            ::contract::Weekday::Tuesday => ::chrono::Tue,
+            ::contract::Weekday::Wednesday => ::chrono::Wed,
+            ::contract::Weekday::Thursday => ::chrono::Thu,
+            ::contract::Weekday::Friday => ::chrono::Fri,
+            ::contract::Weekday::Saturday => ::chrono::Sat
         }
     }
 
     fn from_chrono_weekday(chrono_weekday: ChronoWeekday) -> Weekday {
         match chrono_weekday {
-            ::chrono::Sun => ::contract::Sunday,
-            ::chrono::Mon => ::contract::Monday,
-            ::chrono::Tue => ::contract::Tuesday,
-            ::chrono::Wed => ::contract::Wednesday,
-            ::chrono::Thu => ::contract::Thursday,
-            ::chrono::Fri => ::contract::Friday,
-            ::chrono::Sat => ::contract::Saturday
+            ::chrono::Sun => ::contract::Weekday::Sunday,
+            ::chrono::Mon => ::contract::Weekday::Monday,
+            ::chrono::Tue => ::contract::Weekday::Tuesday,
+            ::chrono::Wed => ::contract::Weekday::Wednesday,
+            ::chrono::Thu => ::contract::Weekday::Thursday,
+            ::chrono::Fri => ::contract::Weekday::Friday,
+            ::chrono::Sat => ::contract::Weekday::Saturday
         }
     }
 }

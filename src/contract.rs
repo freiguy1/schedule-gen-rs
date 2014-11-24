@@ -14,7 +14,7 @@ pub struct Time {
     pub min: u8
 }
 
-#[deriving(Show, Eq, PartialEq, Clone)]
+#[deriving(Show, Eq, PartialEq, Clone, Hash)]
 pub struct Date {
     pub day: u8,
     pub month: u8,
@@ -40,3 +40,16 @@ pub enum Weekday {
     Saturday
 }
 
+pub enum TeamEvent {
+    Game((String, String), (String, String), Date, Time, (String, String)),
+    Bye((String, String), Date)
+}
+
+impl TeamEvent {
+    pub fn get_date(&self) -> Date {
+        match *self {
+            TeamEvent::Game(_, _, date, _, _) => date,
+            TeamEvent::Bye(_, date) => date
+        }
+    }
+}

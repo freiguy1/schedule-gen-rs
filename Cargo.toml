@@ -8,10 +8,7 @@ authors = [ "ethan.frei@gmail.com" ]
 
 name = "schedule_gen"
 
-[dependencies.chrono]
+[dependencies]
 
-git = "https://github.com/lifthrasiir/rust-chrono.git"
-
-[dependencies.uuid]
-
-git = "https://github.com/rust-lang/uuid.git"
+uuid = "~0.0.2"
+chrono = "~0.1.2"
