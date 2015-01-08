@@ -6,7 +6,7 @@ use contract::{ Weekday, Time, Date };
 
 pub trait DateConvert {
     fn to_naive_date_opt(self) -> Option<NaiveDate>;
-    fn from_naive_date(naive_date: &NaiveDate) -> Date;
+    fn from_naive_date(naive_date: &NaiveDate) -> Self;
 }
 
 impl DateConvert for Date {
@@ -46,25 +46,25 @@ pub trait WeekdayConvert {
 impl WeekdayConvert for Weekday {
     fn to_chrono_weekday(&self) -> ChronoWeekday {
         match *self {
-            ::contract::Weekday::Sunday => ::chrono::Sun,
-            ::contract::Weekday::Monday => ::chrono::Mon,
-            ::contract::Weekday::Tuesday => ::chrono::Tue,
-            ::contract::Weekday::Wednesday => ::chrono::Wed,
-            ::contract::Weekday::Thursday => ::chrono::Thu,
-            ::contract::Weekday::Friday => ::chrono::Fri,
-            ::contract::Weekday::Saturday => ::chrono::Sat
+            ::contract::Weekday::Sunday => ::chrono::Weekday::Sun,
+            ::contract::Weekday::Monday => ::chrono::Weekday::Mon,
+            ::contract::Weekday::Tuesday => ::chrono::Weekday::Tue,
+            ::contract::Weekday::Wednesday => ::chrono::Weekday::Wed,
+            ::contract::Weekday::Thursday => ::chrono::Weekday::Thu,
+            ::contract::Weekday::Friday => ::chrono::Weekday::Fri,
+            ::contract::Weekday::Saturday => ::chrono::Weekday::Sat
         }
     }
 
     fn from_chrono_weekday(chrono_weekday: ChronoWeekday) -> Weekday {
         match chrono_weekday {
-            ::chrono::Sun => ::contract::Weekday::Sunday,
-            ::chrono::Mon => ::contract::Weekday::Monday,
-            ::chrono::Tue => ::contract::Weekday::Tuesday,
-            ::chrono::Wed => ::contract::Weekday::Wednesday,
-            ::chrono::Thu => ::contract::Weekday::Thursday,
-            ::chrono::Fri => ::contract::Weekday::Friday,
-            ::chrono::Sat => ::contract::Weekday::Saturday
+            ::chrono::Weekday::Sun => ::contract::Weekday::Sunday,
+            ::chrono::Weekday::Mon => ::contract::Weekday::Monday,
+            ::chrono::Weekday::Tue => ::contract::Weekday::Tuesday,
+            ::chrono::Weekday::Wed => ::contract::Weekday::Wednesday,
+            ::chrono::Weekday::Thu => ::contract::Weekday::Thursday,
+            ::chrono::Weekday::Fri => ::contract::Weekday::Friday,
+            ::chrono::Weekday::Sat => ::contract::Weekday::Saturday
         }
     }
 }

@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use chrono::Datelike;
 
-use std::rand::{task_rng, Rng};
+use std::rand::{thread_rng, Rng};
 
 use contract::{ Time, Date, LeagueSpec, TeamEvent };
 use contract::TeamEvent::{ Game, Bye };
@@ -18,7 +18,7 @@ mod validate;
 pub mod contract;
 
 
-#[deriving(Clone)]
+#[derive(Clone)]
 struct GameShell {
     pub date: Date,
     pub time: Time,
@@ -55,21 +55,21 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
             let non_byes = match bye_id_opt {
                 Some(ref bye_id) => {
                     let bye_date = shells[0].date.clone();
-                    let bye_pair = teams.iter().find(|pair| pair.ref0().ref0() == bye_id || pair.ref1().ref0() == bye_id).unwrap();
-                    if bye_pair.ref0().ref0() == bye_id {
-                        result.push(Bye(bye_pair.val1().clone(), bye_date));
+                    let bye_pair = teams.iter().find(|pair| (pair.0).0 == *bye_id || (pair.1).0 == *bye_id).unwrap();
+                    if (bye_pair.0).0 == *bye_id {
+                        result.push(Bye(bye_pair.1.clone(), bye_date));
                     } else {
-                        result.push(Bye(bye_pair.val0().clone(), bye_date));
+                        result.push(Bye(bye_pair.0.clone(), bye_date));
                     }
-                    teams.iter().filter(|pair| pair.ref0().ref0() != bye_id && pair.ref1().ref0() != bye_id).collect::<Vec<_>>()
+                    teams.iter().filter(|pair| (pair.0).0 != *bye_id && (pair.1).0 != *bye_id).collect::<Vec<_>>()
                 }
                 None => teams.iter().collect::<Vec<_>>()
             };
             for shell_team in shells.iter().zip(non_byes.iter()) {
                 let (shell, team) = shell_team;
                 result.push(Game(
-                    team.val0().clone(),
-                    team.val1().clone(),
+                    team.0.clone(),
+                    team.1.clone(),
                     shell.date.clone(),
                     shell.time.clone(),
                     shell.location.clone()));
@@ -82,14 +82,14 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
 
 fn shuffle_round_robin(
     round_robin: &mut Vec<Vec<(&(String, String), &(String, String))>>) {
-    let mut rng = task_rng();
+    let mut rng = thread_rng();
     let pair: (&(String, String), &(String, String)) = round_robin[round_robin.len() - 1][0];
     rng.shuffle(round_robin.as_mut_slice());
     while round_robin[0].iter().any(|pair2|
-        (pair2.ref0().ref0() == pair.ref0().ref0() &&
-        pair2.ref1().ref0() == pair.ref1().ref0()) ||
-        (pair2.ref1().ref0() == pair.ref0().ref0() &&
-        pair2.ref0().ref0() == pair.ref1().ref0())) {
+        ((pair2.0).0 == (pair.0).0 &&
+        (pair2.1).0 == (pair.1).0) ||
+        ((pair2.1).0 == (pair.0).0 &&
+        (pair2.0).0 == (pair.1).0)) {
         rng.shuffle(round_robin.as_mut_slice());
     }
 
@@ -143,9 +143,9 @@ fn generate_shells(spec: &LeagueSpec) -> Vec<GameShell> {
                 for location in time.location_ids.iter() {
                     if num_games != games_per_night {
                         result.push( GameShell {
-                            date: convert::DateConvert::from_naive_date(&i_date),
+                            date: DateConvert::from_naive_date(&i_date),
                             time: time.time,
-                            location: spec.locations.iter().find(|loc| loc.ref0() == location).unwrap().clone()
+                            location: spec.locations.iter().find(|loc| loc.0 == *location).unwrap().clone()
                         });
                         num_games += 1;
                     }

@@ -10,5 +10,5 @@ name = "schedule_gen"
 
 [dependencies]
 
-uuid = "~0.0.2"
-chrono = "~0.1.2"
+uuid = "0.1.6"
+chrono = "0.1.12"

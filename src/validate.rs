@@ -8,7 +8,10 @@ pub fn validate(spec: &::contract::LeagueSpec) -> Vec<&'static str> {
 
     let mut result: Vec<&str> = Vec::new();
 
-    let start_date_opt = spec.start_date.to_naive_date_opt();
+    let temp = (*spec).start_date;
+    let start_date_opt = temp.to_naive_date_opt();
+
+    //let start_date_opt = spec.start_date.to_naive_date_opt();
     let end_date_opt = spec.end_date.to_naive_date_opt();
 
     match (start_date_opt, end_date_opt) {
@@ -49,7 +52,7 @@ pub fn validate(spec: &::contract::LeagueSpec) -> Vec<&'static str> {
         }
     }
 
-    if used_locations.ne(&spec.locations.iter().map(|x| x.ref0().clone()).collect()) {
+    if used_locations.ne(&spec.locations.iter().map(|x| x.0.clone()).collect()) {
         result.push("Locations used in game_weekday are not equal to the list of locations");
     }
 
