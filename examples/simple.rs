@@ -1,3 +1,5 @@
+#![allow(unstable)]
+
 extern crate schedule_gen;
 
 use std::collections::BTreeMap;
@@ -55,18 +57,6 @@ fn main() {
     match schedule_gen::generate_games(&thing) {
         Ok(games) => {
             println!("Success:");
-            /*for ref game in games.iter() {
-                match game {
-                    &&Game(ref home_team, ref away_team, _, ref time, ref location) => {
-                        println!("\tHome: {}, Away: {}. Time: {}. Location: {}",
-                            home_team, away_team, time, location);
-                    }
-                    &&Bye(ref team, _) => {
-                        println!("\tBye team: {}", team);
-                    }
-                }
-            }
-            */
             let games_by_date = games.iter().fold::<BTreeMap<Date, Vec<&TeamEvent>>, _>(BTreeMap::new(), |mut map, game| {
                 if map.contains_key(&game.get_date()) {
                     map.get_mut(&game.get_date()).unwrap().push(game);
@@ -77,15 +67,15 @@ fn main() {
             });
 
             for (date, events) in games_by_date.iter() {
-                println!("Date: {}", date);
+                println!("Date: {:?}", date);
                 for event in events.iter() {
                     match event {
                         &&Game(ref home_team, ref away_team, _, ref time, ref location) => {
-                            println!("\tHome: {}, Away: {}. Time: {}. Location: {}",
+                            println!("\tHome: {:?}, Away: {:?}. Time: {:?}. Location: {:?}",
                                 home_team, away_team, time, location);
                         }
                         &&Bye(ref team, _) => {
-                            println!("\tBye team: {}", team);
+                            println!("\tBye team: {:?}", team);
                         }
                     }
                 }
@@ -94,7 +84,7 @@ fn main() {
         }
         Err(errors) => {
             println!("Errors:");
-            println!("{}", errors);
+            println!("{:?}", errors);
         }
     }
 }

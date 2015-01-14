@@ -83,8 +83,8 @@ pub fn validate(spec: &::contract::LeagueSpec) -> Vec<&'static str> {
 
     // Check that times don't repeat on a given day
     let mut has_time_repeats = false;
-    let set: HashSet<uint> = spec.game_weekday.game_times.iter()
-        .map(|time| time.time.hour as uint * 60 + time.time.min as uint).collect();
+    let set: HashSet<usize> = spec.game_weekday.game_times.iter()
+        .map(|time| time.time.hour as usize * 60 + time.time.min as usize).collect();
     has_time_repeats = has_time_repeats || set.len() != spec.game_weekday.game_times.len();
 
     if has_time_repeats {
