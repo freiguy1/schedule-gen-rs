@@ -1,5 +1,3 @@
-#![allow(unstable)]
-
 extern crate schedule_gen;
 
 use std::collections::BTreeMap;

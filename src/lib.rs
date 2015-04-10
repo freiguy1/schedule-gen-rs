@@ -1,14 +1,15 @@
 #![crate_name = "schedule_gen"]
-#![allow(unstable)]
+#![feature(convert, collections)]
 
 extern crate uuid;
 extern crate chrono;
+extern crate rand;
 
 use uuid::Uuid;
 
 use chrono::Datelike;
 
-use std::rand::{thread_rng, Rng};
+use rand::{thread_rng, Rng};
 
 use contract::{ Time, Date, LeagueSpec, TeamEvent };
 use contract::TeamEvent::{ Game, Bye };
@@ -51,7 +52,7 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
 
     for rotation in game_shells.as_slice().chunks((teams.len() - 1) * (spec.teams.len() / 2)) {
         shuffle_round_robin(&mut round_robin);
-        for shells_teams in rotation.as_slice().chunks(spec.teams.len() / 2).zip(round_robin.iter()) {
+        for shells_teams in (&rotation).chunks(spec.teams.len() / 2).zip(round_robin.iter()) {
             let (shells, teams) = shells_teams;
             let non_byes = match bye_id_opt {
                 Some(ref bye_id) => {
@@ -105,10 +106,10 @@ fn generate_round_robin(teams: &Vec<(String, String)>) -> Vec<Vec<(&(String, Str
 
     let mut result: Vec<Vec<(&(String, String), &(String, String))>> = Vec::new();
 
-    for _ in range(0us, teams.len() - 1) {
+    for _ in 0us..(teams.len() - 1) {
         let mut session: Vec<(&(String, String), &(String, String))> = Vec::new();
         session.push((other_teams[0], static_team));
-        for i in range(0us, (other_teams.len() - 1) / 2) {
+        for i in 0us..((other_teams.len() - 1) / 2) {
             let team_1: &(String, String) = other_teams[i+1];
             let team_2: &(String, String) = other_teams[other_teams.len() - 1 - i];
             session.push((team_1, team_2));
@@ -116,7 +117,7 @@ fn generate_round_robin(teams: &Vec<(String, String)>) -> Vec<Vec<(&(String, Str
 
         // Rotate other_teams
         let temp = other_teams[0];
-        for i in range(0us, other_teams.len() - 1) {
+        for i in 0us..(other_teams.len() - 1) {
             other_teams[i] = other_teams[i + 1];
         }
         let other_teams_len = other_teams.len() - 1;

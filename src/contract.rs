@@ -7,13 +7,13 @@ pub struct LeagueSpec {
     pub game_weekday: GameWeekday
 }
 
-#[derive(Show, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Time {
     pub hour: u8,
     pub min: u8
 }
 
-#[derive(Show, Eq, PartialEq, Clone, PartialOrd, Ord, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, PartialOrd, Ord, Copy)]
 pub struct Date {
     pub year: u16,
     pub month: u8,
@@ -31,7 +31,7 @@ pub struct GameTime {
     pub location_ids: Vec<String>
 }
 
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub enum Weekday {
     Sunday,
     Monday,
