@@ -106,10 +106,10 @@ fn generate_round_robin(teams: &Vec<(String, String)>) -> Vec<Vec<(&(String, Str
 
     let mut result: Vec<Vec<(&(String, String), &(String, String))>> = Vec::new();
 
-    for _ in 0us..(teams.len() - 1) {
+    for _ in 0..(teams.len() - 1) {
         let mut session: Vec<(&(String, String), &(String, String))> = Vec::new();
         session.push((other_teams[0], static_team));
-        for i in 0us..((other_teams.len() - 1) / 2) {
+        for i in 0..((other_teams.len() - 1) / 2) {
             let team_1: &(String, String) = other_teams[i+1];
             let team_2: &(String, String) = other_teams[other_teams.len() - 1 - i];
             session.push((team_1, team_2));
@@ -117,7 +117,7 @@ fn generate_round_robin(teams: &Vec<(String, String)>) -> Vec<Vec<(&(String, Str
 
         // Rotate other_teams
         let temp = other_teams[0];
-        for i in 0us..(other_teams.len() - 1) {
+        for i in 0..(other_teams.len() - 1) {
             other_teams[i] = other_teams[i + 1];
         }
         let other_teams_len = other_teams.len() - 1;
