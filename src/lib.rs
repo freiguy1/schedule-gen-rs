@@ -1,5 +1,4 @@
 #![crate_name = "schedule_gen"]
-#![feature(convert, collections)]
 
 extern crate uuid;
 extern crate chrono;
@@ -38,10 +37,10 @@ pub fn generate_games(spec: &LeagueSpec) -> Result<Vec<TeamEvent>, Vec<&'static 
     // Create a new list of teams which includes our fake bye team if needed
     let mut teams = spec.teams.clone();
     let mut bye_id_opt: Option<String> = None;
-    let generated_uuid = Uuid::new_v4().to_hyphenated_string();
+    let generated_uuid = Uuid::new_v4().hyphenated().to_string();
     if teams.len() % 2 == 1 {
         bye_id_opt = Some(generated_uuid.clone());
-        teams.push((generated_uuid, String::from_str("Bye team")));
+        teams.push((generated_uuid, "Bye team".to_string()));
     }
     let teams = teams;
     let bye_id_opt: Option<String> = bye_id_opt;

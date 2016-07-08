@@ -10,6 +10,6 @@ name = "schedule_gen"
 
 [dependencies]
 
-uuid = "*"
+uuid = {version = "0.2", features = ["v4"] }
 chrono = "*"
 rand = "*"
